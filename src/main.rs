@@ -10,7 +10,7 @@ async fn main() {
     let mut vehicles_right: Vec<Vehicle> = vec![];
     let mut traffic_lights = make_lights();
     let mut all_vehicles: Vec<Vec<Vehicle>> = vec![vec![]];
-
+    let mut count = 0;
 
     request_new_screen_size(800.0, 800.0);
     loop {
@@ -70,21 +70,48 @@ async fn main() {
             }
         }
 
-        all_vehicles = vec![vehicles_up.clone(), vehicles_left.clone(), vehicles_down.clone(), vehicles_right.clone()];
+        all_vehicles = vec![
+            vehicles_up.clone(),
+            vehicles_left.clone(),
+            vehicles_down.clone(),
+            vehicles_right.clone()
+        ];
 
         // UP (already handled earlier)
         if !vehicles_up.is_empty() {
             vehicles_up[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_up[0].draw();
-
+            
             for i in 1..vehicles_up.len() {
                 let (head, tail) = vehicles_up.split_at_mut(i);
                 let prev = &head[i - 1];
                 let curr = &mut tail[0];
 
                 curr.draw();
-                if (curr.y - prev.y).abs() <= 50  {
-                    continue;
+
+                if curr.direction == prev.direction {
+                    match curr.direction {
+                        Direction::Up => {
+                            if curr.y - prev.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Down => {
+                            if prev.y - curr.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Left => {
+                            if curr.x - prev.x <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Right => {
+                            if prev.x - curr.x <= 50 {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 curr.update(&mut traffic_lights, &all_vehicles);
@@ -95,6 +122,7 @@ async fn main() {
         if !vehicles_down.is_empty() {
             vehicles_down[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_down[0].draw();
+            
 
             for i in 1..vehicles_down.len() {
                 let (head, tail) = vehicles_down.split_at_mut(i);
@@ -102,8 +130,29 @@ async fn main() {
                 let curr = &mut tail[0];
 
                 curr.draw();
-                if (prev.y - curr.y).abs() <= 50  {
-                    continue;
+                if curr.direction == prev.direction {
+                    match curr.direction {
+                        Direction::Up => {
+                            if curr.y - prev.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Down => {
+                            if prev.y - curr.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Left => {
+                            if curr.x - prev.x <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Right => {
+                            if prev.x - curr.x <= 50 {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 curr.update(&mut traffic_lights, &all_vehicles);
@@ -114,15 +163,37 @@ async fn main() {
         if !vehicles_left.is_empty() {
             vehicles_left[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_left[0].draw();
+            
 
             for i in 1..vehicles_left.len() {
                 let (head, tail) = vehicles_left.split_at_mut(i);
                 let prev = &head[i - 1];
                 let curr = &mut tail[0];
-                
+
                 curr.draw();
-                if (prev.x - curr.x).abs() <= 50  {
-                    continue;
+                if curr.direction == prev.direction {
+                    match curr.direction {
+                        Direction::Up => {
+                            if curr.y - prev.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Down => {
+                            if prev.y - curr.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Left => {
+                            if curr.x - prev.x <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Right => {
+                            if prev.x - curr.x <= 50 {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 curr.update(&mut traffic_lights, &all_vehicles);
@@ -133,6 +204,7 @@ async fn main() {
         if !vehicles_right.is_empty() {
             vehicles_right[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_right[0].draw();
+            
 
             for i in 1..vehicles_right.len() {
                 let (head, tail) = vehicles_right.split_at_mut(i);
@@ -140,8 +212,29 @@ async fn main() {
                 let curr = &mut tail[0];
 
                 curr.draw();
-                if (curr.x - prev.x).abs() <= 50 {
-                    continue;
+                if curr.direction == prev.direction {
+                    match curr.direction {
+                        Direction::Up => {
+                            if curr.y - prev.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Down => {
+                            if prev.y - curr.y <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Left => {
+                            if curr.x - prev.x <= 50 {
+                                continue;
+                            }
+                        }
+                        Direction::Right => {
+                            if prev.x - curr.x <= 50 {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 curr.update(&mut traffic_lights, &all_vehicles);
@@ -158,5 +251,4 @@ async fn main() {
         }
         next_frame().await;
     }
-    
 }

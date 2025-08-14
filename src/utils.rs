@@ -78,24 +78,25 @@ impl Vehicle {
     }
 
     pub fn update(&mut self, traffic_lights: &mut TrafficLights, all_vehicles: &Vec<Vec<Vehicle>>) {
-        if self.pause {
-            return;
-        }
         match self.direction {
             Direction::Up => {
-                self.y -= self.speed;
+                if self.y <= 448 && self.y >= 350 {
+                    self.flmorb3 = true;
+                } else {
+                    self.flmorb3 = false;
+                }
                 if self.y <= 450 && self.y >= 448 {
-                    self.pause = false;
+                    self.pause = true;
                     if !self.flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
                 }
                 if traffic_lights.up.light == Light::Green {
                     self.pause = false;
-                    self.flmorb3 = true;
-                } else if self.y <= 450 && self.y >= 448 {
-                    self.pause = true;
-                }
+                } 
+                
+                self.y -= self.speed;
+
                 if self.y <= 405 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Right;
@@ -105,11 +106,18 @@ impl Vehicle {
                         self.dar = true;
                     }
                 }
+                if self.dar {
+                    self.flmorb3 = false;
+                }
             }
             Direction::Down => {
-                self.y += self.speed;
+                if self.y >= 320 && self.y <= 420 {
+                    self.flmorb3 = true;
+                } else {
+                    self.flmorb3 = false;
+                }
                 if self.y >= 320 && self.y <= 323 {
-                    self.pause = false;
+                    self.pause = true;
                     if !self.flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
@@ -117,9 +125,11 @@ impl Vehicle {
                 if traffic_lights.down.light == Light::Green {
                     self.pause = false;
                     self.flmorb3 = true;
-                } else if self.y >= 320 && self.y <= 323 {
-                    self.pause = true;
                 }
+                if self.pause {
+                    return;
+                }
+                self.y += self.speed;
                 if self.y >= 355 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Left;
@@ -131,9 +141,13 @@ impl Vehicle {
                 }
             }
             Direction::Left => {
-                self.x -= self.speed;
+                if self.x <= 448 && self.x >= 350 {
+                    self.flmorb3 = true;
+                } else {
+                    self.flmorb3 = false;
+                }
                 if self.x <= 450 && self.x >= 448 {
-                    self.pause = false;
+                    self.pause = true;
                     if !self.flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
@@ -141,9 +155,11 @@ impl Vehicle {
                 if traffic_lights.left.light == Light::Green {
                     self.pause = false;
                     self.flmorb3 = true;
-                } else if self.x <= 450 && self.x >= 448 {
-                    self.pause = true;
                 }
+                if self.pause {
+                    return;
+                }
+                self.x -= self.speed;
                 if self.x <= 405 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Up;
@@ -155,7 +171,11 @@ impl Vehicle {
                 }
             }
             Direction::Right => {
-                self.x += self.speed;
+                if self.x <= 448 && self.x >= 350 {
+                    self.flmorb3 = true;
+                } else {
+                    self.flmorb3 = false;
+                }
                 if self.x >= 320 && self.x <= 323 {
                     self.pause = true;
                     if !self.flmorb3 {
@@ -165,9 +185,11 @@ impl Vehicle {
                 if traffic_lights.right.light == Light::Green {
                     self.pause = false;
                     self.flmorb3 = true;
-                } else {
-                    self.pause = true;
+                } 
+                if self.pause {
+                    return;
                 }
+                self.x += self.speed;
                 if self.x >= 355 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Down;
@@ -177,14 +199,6 @@ impl Vehicle {
                         self.dar = true;
                     }
                 }
-                println!(
-                    "Vehicle at ({}, {}, {}) moving {:?}, traffic {:?}",
-                    self.flmorb3,
-                    self.x,
-                    self.pause,
-                    self.direction,
-                    traffic_lights.right.light
-                );
             }
         }
         check_in_rond_point(self, traffic_lights);
