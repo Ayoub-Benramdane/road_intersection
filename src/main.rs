@@ -9,11 +9,14 @@ async fn main() {
     let mut vehicles_left: Vec<Vehicle> = vec![];
     let mut vehicles_right: Vec<Vehicle> = vec![];
     let mut traffic_lights = make_lights();
-    let mut all_vehicles: Vec<Vec<Vehicle>> = vec![vec![]];
-    let mut count = 0;
 
     request_new_screen_size(800.0, 800.0);
     loop {
+        vehicles_down.retain(|c| (c.y < 800 && c.y > -35 && c.x < 800 && c.x > -35));
+        vehicles_up.retain(|c| (c.y < 800 && c.y > -35 && c.x < 800 && c.x > -35));
+        vehicles_left.retain(|c| (c.x < 800 && c.x > -35 && c.y < 800 && c.y > -35));
+        vehicles_right.retain(|c| (c.x < 800 && c.x > -35 && c.y < 800 && c.y > -35));
+
         clear_background(BLACK);
         draw_rectangle(350.0, 0.0, 100.0, 800.0, GRAY);
         draw_rectangle(0.0, 350.0, 800.0, 100.0, GRAY);
@@ -70,7 +73,7 @@ async fn main() {
             }
         }
 
-        all_vehicles = vec![
+        let all_vehicles = vec![
             vehicles_up.clone(),
             vehicles_left.clone(),
             vehicles_down.clone(),
@@ -81,7 +84,7 @@ async fn main() {
         if !vehicles_up.is_empty() {
             vehicles_up[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_up[0].draw();
-            
+
             for i in 1..vehicles_up.len() {
                 let (head, tail) = vehicles_up.split_at_mut(i);
                 let prev = &head[i - 1];
@@ -122,7 +125,6 @@ async fn main() {
         if !vehicles_down.is_empty() {
             vehicles_down[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_down[0].draw();
-            
 
             for i in 1..vehicles_down.len() {
                 let (head, tail) = vehicles_down.split_at_mut(i);
@@ -163,7 +165,6 @@ async fn main() {
         if !vehicles_left.is_empty() {
             vehicles_left[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_left[0].draw();
-            
 
             for i in 1..vehicles_left.len() {
                 let (head, tail) = vehicles_left.split_at_mut(i);
@@ -204,7 +205,6 @@ async fn main() {
         if !vehicles_right.is_empty() {
             vehicles_right[0].update(&mut traffic_lights, &all_vehicles);
             vehicles_right[0].draw();
-            
 
             for i in 1..vehicles_right.len() {
                 let (head, tail) = vehicles_right.split_at_mut(i);

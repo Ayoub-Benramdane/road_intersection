@@ -80,11 +80,6 @@ impl Vehicle {
     pub fn update(&mut self, traffic_lights: &mut TrafficLights, all_vehicles: &Vec<Vec<Vehicle>>) {
         match self.direction {
             Direction::Up => {
-                if self.y <= 448 && self.y >= 350 {
-                    self.flmorb3 = true;
-                } else {
-                    self.flmorb3 = false;
-                }
                 if self.y <= 450 && self.y >= 448 {
                     self.pause = true;
                     if !self.flmorb3 {
@@ -95,6 +90,9 @@ impl Vehicle {
                     self.pause = false;
                 } 
                 
+                if self.pause {
+                    return;
+                }
                 self.y -= self.speed;
 
                 if self.y <= 405 && !self.dar {
@@ -111,11 +109,6 @@ impl Vehicle {
                 }
             }
             Direction::Down => {
-                if self.y >= 320 && self.y <= 420 {
-                    self.flmorb3 = true;
-                } else {
-                    self.flmorb3 = false;
-                }
                 if self.y >= 320 && self.y <= 323 {
                     self.pause = true;
                     if !self.flmorb3 {
@@ -141,11 +134,6 @@ impl Vehicle {
                 }
             }
             Direction::Left => {
-                if self.x <= 448 && self.x >= 350 {
-                    self.flmorb3 = true;
-                } else {
-                    self.flmorb3 = false;
-                }
                 if self.x <= 450 && self.x >= 448 {
                     self.pause = true;
                     if !self.flmorb3 {
@@ -171,11 +159,6 @@ impl Vehicle {
                 }
             }
             Direction::Right => {
-                if self.x <= 448 && self.x >= 350 {
-                    self.flmorb3 = true;
-                } else {
-                    self.flmorb3 = false;
-                }
                 if self.x >= 320 && self.x <= 323 {
                     self.pause = true;
                     if !self.flmorb3 {
@@ -237,23 +220,23 @@ impl Direction {
 impl TrafficLights {
     pub fn draw(&self) {
         match self.up.light {
-            Light::Red => draw_rectangle(self.up.x as f32, self.up.y as f32, 20.0, 20.0, RED),
-            Light::Green => draw_rectangle(self.up.x as f32, self.up.y as f32, 20.0, 20.0, GREEN),
+            Light::Red => draw_circle(self.up.x as f32, self.up.y as f32, 20.0,  RED),
+            Light::Green => draw_circle(self.up.x as f32, self.up.y as f32, 20.0, GREEN),
         }
         match self.down.light {
-            Light::Red => draw_rectangle(self.down.x as f32, self.down.y as f32, 20.0, 20.0, RED),
+            Light::Red => draw_circle(self.down.x as f32, self.down.y as f32, 20.0, RED),
             Light::Green =>
-                draw_rectangle(self.down.x as f32, self.down.y as f32, 20.0, 20.0, GREEN),
+                draw_circle(self.down.x as f32, self.down.y as f32, 20.0, GREEN),
         }
         match self.left.light {
-            Light::Red => draw_rectangle(self.left.x as f32, self.left.y as f32, 20.0, 20.0, RED),
+            Light::Red => draw_circle(self.left.x as f32, self.left.y as f32, 20.0, RED),
             Light::Green =>
-                draw_rectangle(self.left.x as f32, self.left.y as f32, 20.0, 20.0, GREEN),
+                draw_circle(self.left.x as f32, self.left.y as f32, 20.0, GREEN),
         }
         match self.right.light {
-            Light::Red => draw_rectangle(self.right.x as f32, self.right.y as f32, 20.0, 20.0, RED),
+            Light::Red => draw_circle(self.right.x as f32, self.right.y as f32, 20.0, RED),
             Light::Green =>
-                draw_rectangle(self.right.x as f32, self.right.y as f32, 20.0, 20.0, GREEN),
+                draw_circle(self.right.x as f32, self.right.y as f32, 20.0, GREEN),
         }
     }
 }
@@ -288,17 +271,17 @@ pub fn make_lights() -> TrafficLights {
             light: Light::Red,
         },
         up: TrafficLight {
-            x: 460,
-            y: 460,
+            x: 480,
+            y: 480,
             light: Light::Red,
         },
         right: TrafficLight {
             x: 320,
-            y: 460,
+            y: 480,
             light: Light::Red,
         },
         left: TrafficLight {
-            x: 460,
+            x: 480,
             y: 320,
             light: Light::Red,
         },
