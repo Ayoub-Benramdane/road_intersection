@@ -9,13 +9,15 @@ async fn main() {
     let mut vehicles_left: Vec<Vehicle> = vec![];
     let mut vehicles_right: Vec<Vehicle> = vec![];
     let mut traffic_lights = make_lights();
-
+    let mut flmorb3 = false;
     request_new_screen_size(800.0, 800.0);
     loop {
-        vehicles_down.retain(|c| (c.y < 800 && c.y > -35 && c.x < 800 && c.x > -35));
-        vehicles_up.retain(|c| (c.y < 800 && c.y > -35 && c.x < 800 && c.x > -35));
-        vehicles_left.retain(|c| (c.x < 800 && c.x > -35 && c.y < 800 && c.y > -35));
-        vehicles_right.retain(|c| (c.x < 800 && c.x > -35 && c.y < 800 && c.y > -35));
+        println!("{flmorb3}");
+
+        vehicles_up.retain(|v| v.x >= -32 && v.x <= 800 && v.y >= -32 && v.y <= 800);
+        vehicles_down.retain(|v| v.x >= -32 && v.x <= 800 && v.y >= -32 && v.y <= 800);
+        vehicles_right.retain(|v| v.x >= -32 && v.x <= 800 && v.y >= -32 && v.y <= 800);
+        vehicles_left.retain(|v| v.x >= -32 && v.x <= 800 && v.y >= -32 && v.y <= 800);
 
         clear_background(BLACK);
         draw_rectangle(350.0, 0.0, 100.0, 800.0, GRAY);
@@ -30,36 +32,36 @@ async fn main() {
 
         if is_key_down(KeyCode::Up) {
             if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 735 {
-                vehicles_up.push(Vehicle::new(405, 800, 3, Direction::Up));
+                vehicles_up.push(Vehicle::new(425, 800, 1, Direction::Up));
             }
         } else if is_key_down(KeyCode::Down) {
             if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 65 {
-                vehicles_down.push(Vehicle::new(355, 0, 3, Direction::Down));
+                vehicles_down.push(Vehicle::new(375, 0, 1, Direction::Down));
             }
         } else if is_key_down(KeyCode::Left) {
             if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 735 {
-                vehicles_left.push(Vehicle::new(800, 355, 3, Direction::Left));
+                vehicles_left.push(Vehicle::new(800, 375, 1, Direction::Left));
             }
         } else if is_key_down(KeyCode::Right) {
             if vehicles_right.len() == 0 || vehicles_right[vehicles_right.len() - 1].x >= 65 {
-                vehicles_right.push(Vehicle::new(0, 405, 3, Direction::Right));
+                vehicles_right.push(Vehicle::new(0, 425, 1, Direction::Right));
             }
         } else if is_key_pressed(KeyCode::R) {
             let direction = Direction::random();
             match direction {
                 Direction::Up => {
                     if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 710 {
-                        vehicles_up.push(Vehicle::new(405, 800, 3, Direction::Up));
+                        vehicles_up.push(Vehicle::new(405, 800, 1, Direction::Up));
                     }
                 }
                 Direction::Down => {
                     if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 90 {
-                        vehicles_down.push(Vehicle::new(355, 0, 3, Direction::Down));
+                        vehicles_down.push(Vehicle::new(355, 0, 1, Direction::Down));
                     }
                 }
                 Direction::Left => {
                     if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 710 {
-                        vehicles_left.push(Vehicle::new(800, 355, 3, Direction::Left));
+                        vehicles_left.push(Vehicle::new(800, 355, 1, Direction::Left));
                     }
                 }
                 Direction::Right => {
@@ -67,13 +69,13 @@ async fn main() {
                         vehicles_right.len() == 0 ||
                         vehicles_right[vehicles_right.len() - 1].x >= 90
                     {
-                        vehicles_right.push(Vehicle::new(0, 405, 3, Direction::Right));
+                        vehicles_right.push(Vehicle::new(0, 405, 1, Direction::Right));
                     }
                 }
             }
         }
 
-        let all_vehicles = vec![
+        let mut all_vehicles: Vec<Vec<Vehicle>> = vec![
             vehicles_up.clone(),
             vehicles_left.clone(),
             vehicles_down.clone(),
@@ -82,7 +84,7 @@ async fn main() {
 
         // UP (already handled earlier)
         if !vehicles_up.is_empty() {
-            vehicles_up[0].update(&mut traffic_lights, &all_vehicles);
+            vehicles_up[0].update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             vehicles_up[0].draw();
 
             for i in 1..vehicles_up.len() {
@@ -117,13 +119,13 @@ async fn main() {
                     }
                 }
 
-                curr.update(&mut traffic_lights, &all_vehicles);
+                curr.update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             }
         }
 
         // DOWN
         if !vehicles_down.is_empty() {
-            vehicles_down[0].update(&mut traffic_lights, &all_vehicles);
+            vehicles_down[0].update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             vehicles_down[0].draw();
 
             for i in 1..vehicles_down.len() {
@@ -157,13 +159,13 @@ async fn main() {
                     }
                 }
 
-                curr.update(&mut traffic_lights, &all_vehicles);
+                curr.update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             }
         }
 
         // LEFT
         if !vehicles_left.is_empty() {
-            vehicles_left[0].update(&mut traffic_lights, &all_vehicles);
+            vehicles_left[0].update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             vehicles_left[0].draw();
 
             for i in 1..vehicles_left.len() {
@@ -197,13 +199,13 @@ async fn main() {
                     }
                 }
 
-                curr.update(&mut traffic_lights, &all_vehicles);
+                curr.update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             }
         }
 
         // RIGHTR{
         if !vehicles_right.is_empty() {
-            vehicles_right[0].update(&mut traffic_lights, &all_vehicles);
+            vehicles_right[0].update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             vehicles_right[0].draw();
 
             for i in 1..vehicles_right.len() {
@@ -237,7 +239,7 @@ async fn main() {
                     }
                 }
 
-                curr.update(&mut traffic_lights, &all_vehicles);
+                curr.update(&mut traffic_lights, &mut all_vehicles, &mut flmorb3);
             }
         }
 

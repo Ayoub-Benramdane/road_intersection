@@ -6,10 +6,10 @@ pub struct Vehicle {
     pub y: i32,
     pub speed: i32,
     pub color: Color,
+    pub origin: Direction,
     pub direction: Direction,
     pub turn: Turn,
     pub dar: bool,
-    pub flmorb3: bool,
     pub pause: bool,
 }
 
@@ -56,10 +56,10 @@ impl Vehicle {
             y,
             speed,
             color: Vehicle::color(),
+            origin: direction.clone(),
             direction,
             turn: Turn::Straight,
             dar: false,
-            flmorb3: false,
             pause: false,
         };
 
@@ -77,131 +77,187 @@ impl Vehicle {
         colors[quad_rand::gen_range(0, colors.len())]
     }
 
-    pub fn update(&mut self, traffic_lights: &mut TrafficLights, all_vehicles: &Vec<Vec<Vehicle>>) {
+    pub fn update(
+        &mut self,
+        traffic_lights: &mut TrafficLights,
+        all_vehicles: &mut Vec<Vec<Vehicle>>,
+        flmorb3: &mut bool
+    ) {
         match self.direction {
             Direction::Up => {
-                if self.y <= 450 && self.y >= 448 {
+                if self.y == 465 {
                     self.pause = true;
-                    if !self.flmorb3 {
+                    if !*flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
                 }
-                if traffic_lights.up.light == Light::Green {
+                if (*flmorb3 && self.y < 464) || !*flmorb3 {
                     self.pause = false;
-                } 
-                
+                }
                 if self.pause {
                     return;
                 }
                 self.y -= self.speed;
 
-                if self.y <= 405 && !self.dar {
+                if self.y <= 425 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Right;
                         self.dar = true;
-                    } else if self.turn == Turn::Left && self.y <= 355 {
+                    } else if self.turn == Turn::Left && self.y <= 375 {
                         self.direction = Direction::Left;
                         self.dar = true;
                     }
                 }
-                if self.dar {
-                    self.flmorb3 = false;
-                }
             }
             Direction::Down => {
-                if self.y >= 320 && self.y <= 323 {
+                if self.y == 335 {
                     self.pause = true;
-                    if !self.flmorb3 {
+                    if !*flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
                 }
-                if traffic_lights.down.light == Light::Green {
+                if (*flmorb3 && self.y > 336) || !*flmorb3 {
                     self.pause = false;
-                    self.flmorb3 = true;
                 }
                 if self.pause {
                     return;
                 }
                 self.y += self.speed;
-                if self.y >= 355 && !self.dar {
+                if self.y >= 375 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Left;
                         self.dar = true;
-                    } else if self.turn == Turn::Left && self.y >= 405 {
+                    } else if self.turn == Turn::Left && self.y >= 425 {
                         self.direction = Direction::Right;
                         self.dar = true;
                     }
                 }
             }
             Direction::Left => {
-                if self.x <= 450 && self.x >= 448 {
+                if self.x == 465 {
                     self.pause = true;
-                    if !self.flmorb3 {
+                    if !*flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
                 }
-                if traffic_lights.left.light == Light::Green {
+                if (*flmorb3 && self.x < 464) || !*flmorb3 {
                     self.pause = false;
-                    self.flmorb3 = true;
                 }
                 if self.pause {
                     return;
                 }
                 self.x -= self.speed;
-                if self.x <= 405 && !self.dar {
+                if self.x <= 425 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Up;
                         self.dar = true;
-                    } else if self.turn == Turn::Left && self.x <= 355 {
+                    } else if self.turn == Turn::Left && self.x <= 375 {
                         self.direction = Direction::Down;
                         self.dar = true;
                     }
                 }
             }
             Direction::Right => {
-                if self.x >= 320 && self.x <= 323 {
+                if self.x == 335 {
                     self.pause = true;
-                    if !self.flmorb3 {
+                    if !*flmorb3 {
                         update_traffic_lights(traffic_lights, all_vehicles);
                     }
                 }
-                if traffic_lights.right.light == Light::Green {
+                if (*flmorb3 && self.x > 336) || !*flmorb3 {
                     self.pause = false;
-                    self.flmorb3 = true;
-                } 
+                }
                 if self.pause {
                     return;
                 }
                 self.x += self.speed;
-                if self.x >= 355 && !self.dar {
+                if self.x >= 375 && !self.dar {
                     if self.turn == Turn::Right {
                         self.direction = Direction::Down;
                         self.dar = true;
-                    } else if self.turn == Turn::Left && self.x >= 405 {
+                    } else if self.turn == Turn::Left && self.x >= 425 {
                         self.direction = Direction::Up;
                         self.dar = true;
                     }
                 }
             }
         }
-        check_in_rond_point(self, traffic_lights);
+        check_in_rond_point(self, traffic_lights, flmorb3);
     }
 
     pub fn draw(&self) {
-        draw_rectangle(self.x as f32, self.y as f32, 30.0, 30.0, self.color);
+        draw_rectangle((self.x - 15) as f32, (self.y - 15) as f32, 30.0, 30.0, self.color);
     }
 }
 
-pub fn check_in_rond_point(vehicle: &mut Vehicle, traffic_lights: &mut TrafficLights) {
-    if vehicle.x >= 320 && vehicle.x <= 480 && vehicle.y >= 320 && vehicle.y <= 480 {
-        if vehicle.x >= 350 && vehicle.x <= 420 && vehicle.y >= 350 && vehicle.y <= 420 {
-            traffic_lights.up.light = Light::Red;
-            traffic_lights.down.light = Light::Red;
-            traffic_lights.left.light = Light::Red;
-            traffic_lights.right.light = Light::Red;
+pub fn check_in_rond_point(
+    vehicle: &mut Vehicle,
+    traffic_lights: &mut TrafficLights,
+    flmorb3: &mut bool
+) {
+    let mut a: (bool, bool, bool, bool) = (false, false, false, false);
+    if vehicle.x > 325 && vehicle.x < 475 && vehicle.y > 325 && vehicle.y < 475 {
+        *flmorb3 = true;
+        match vehicle.origin {
+            Direction::Up => {
+                if vehicle.color == YELLOW {
+                    a.0 = true;
+                    a.1 = true;
+                    a.3 = true;
+                } else {
+                    a.0 = true;
+                    a.2 = true;
+                }
+            }
+            Direction::Down => {
+                if vehicle.color == YELLOW {
+                    a.1 = true;
+                    a.2 = true;
+                    a.3 = true;
+                } else {
+                    a.0 = true;
+                    a.2 = true;
+                }
+            }
+            Direction::Left => {
+                if vehicle.color == YELLOW {
+                    a.0 = true;
+                    a.1 = true;
+                    a.2 = true;
+                } else {
+                    a.1 = true;
+                    a.3 = true;
+                }
+            }
+            Direction::Right => {
+                if vehicle.color == YELLOW {
+                    a.0 = true;
+                    a.2 = true;
+                    a.3 = true;
+                } else {
+                    a.1 = true;
+                    a.3 = true;
+                }
+            }
         }
     } else {
-        vehicle.flmorb3 = false;
+        *flmorb3 = false;
+        traffic_lights.up.light = Light::Red;
+        traffic_lights.down.light = Light::Red;
+        traffic_lights.left.light = Light::Red;
+        traffic_lights.right.light = Light::Red;
+    }
+    if a.0 {
+        traffic_lights.up.light = Light::Green;
+    }
+    if a.1 {
+        traffic_lights.right.light = Light::Green;
+    }
+    if a.2 {
+        traffic_lights.down.light = Light::Green;
+    }
+    if a.3 {
+        traffic_lights.left.light = Light::Green;
     }
 }
 
@@ -220,23 +276,20 @@ impl Direction {
 impl TrafficLights {
     pub fn draw(&self) {
         match self.up.light {
-            Light::Red => draw_circle(self.up.x as f32, self.up.y as f32, 20.0,  RED),
+            Light::Red => draw_circle(self.up.x as f32, self.up.y as f32, 20.0, RED),
             Light::Green => draw_circle(self.up.x as f32, self.up.y as f32, 20.0, GREEN),
         }
         match self.down.light {
             Light::Red => draw_circle(self.down.x as f32, self.down.y as f32, 20.0, RED),
-            Light::Green =>
-                draw_circle(self.down.x as f32, self.down.y as f32, 20.0, GREEN),
+            Light::Green => draw_circle(self.down.x as f32, self.down.y as f32, 20.0, GREEN),
         }
         match self.left.light {
             Light::Red => draw_circle(self.left.x as f32, self.left.y as f32, 20.0, RED),
-            Light::Green =>
-                draw_circle(self.left.x as f32, self.left.y as f32, 20.0, GREEN),
+            Light::Green => draw_circle(self.left.x as f32, self.left.y as f32, 20.0, GREEN),
         }
         match self.right.light {
             Light::Red => draw_circle(self.right.x as f32, self.right.y as f32, 20.0, RED),
-            Light::Green =>
-                draw_circle(self.right.x as f32, self.right.y as f32, 20.0, GREEN),
+            Light::Green => draw_circle(self.right.x as f32, self.right.y as f32, 20.0, GREEN),
         }
     }
 }
@@ -289,13 +342,6 @@ pub fn make_lights() -> TrafficLights {
 }
 
 pub fn update_traffic_lights(traffic_lights: &mut TrafficLights, all_vehicles: &Vec<Vec<Vehicle>>) {
-    if !all_vehicles.is_empty() {
-        traffic_lights.up.light = Light::Red;
-        traffic_lights.down.light = Light::Red;
-        traffic_lights.left.light = Light::Red;
-        traffic_lights.right.light = Light::Red;
-    }
-
     let mut index = vec![];
     let mut max_len = 0;
     for (ind, vehicles) in all_vehicles.iter().enumerate() {
