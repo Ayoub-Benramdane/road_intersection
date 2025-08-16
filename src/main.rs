@@ -31,46 +31,43 @@ async fn main() {
         traffic_lights.draw();
 
         if is_key_down(KeyCode::Up) {
-            if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 735 {
+            if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 705 {
                 vehicles_up.push(Vehicle::new(425, 800, 1, Direction::Up));
             }
         } else if is_key_down(KeyCode::Down) {
-            if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 65 {
+            if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 95 {
                 vehicles_down.push(Vehicle::new(375, 0, 1, Direction::Down));
             }
         } else if is_key_down(KeyCode::Left) {
-            if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 735 {
+            if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 705 {
                 vehicles_left.push(Vehicle::new(800, 375, 1, Direction::Left));
             }
         } else if is_key_down(KeyCode::Right) {
-            if vehicles_right.len() == 0 || vehicles_right[vehicles_right.len() - 1].x >= 65 {
+            if vehicles_right.len() == 0 || vehicles_right[vehicles_right.len() - 1].x >= 95 {
                 vehicles_right.push(Vehicle::new(0, 425, 1, Direction::Right));
             }
         } else if is_key_pressed(KeyCode::R) {
             let direction = Direction::random();
             match direction {
                 Direction::Up => {
-                    if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 710 {
-                        vehicles_up.push(Vehicle::new(405, 800, 1, Direction::Up));
-                    }
+                    if vehicles_up.len() == 0 || vehicles_up[vehicles_up.len() - 1].y <= 705 {
+                vehicles_up.push(Vehicle::new(425, 800, 1, Direction::Up));
+            }
                 }
                 Direction::Down => {
-                    if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 90 {
-                        vehicles_down.push(Vehicle::new(355, 0, 1, Direction::Down));
-                    }
+                    if vehicles_down.len() == 0 || vehicles_down[vehicles_down.len() - 1].y >= 95 {
+                vehicles_down.push(Vehicle::new(375, 0, 1, Direction::Down));
+            }
                 }
                 Direction::Left => {
-                    if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 710 {
-                        vehicles_left.push(Vehicle::new(800, 355, 1, Direction::Left));
-                    }
+                    if vehicles_left.len() == 0 || vehicles_left[vehicles_left.len() - 1].x <= 705 {
+                vehicles_left.push(Vehicle::new(800, 375, 1, Direction::Left));
+            }
                 }
                 Direction::Right => {
-                    if
-                        vehicles_right.len() == 0 ||
-                        vehicles_right[vehicles_right.len() - 1].x >= 90
-                    {
-                        vehicles_right.push(Vehicle::new(0, 405, 1, Direction::Right));
-                    }
+                    if vehicles_right.len() == 0 || vehicles_right[vehicles_right.len() - 1].x >= 95 {
+                vehicles_right.push(Vehicle::new(0, 425, 1, Direction::Right));
+            }
                 }
             }
         }
